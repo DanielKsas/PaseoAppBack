@@ -3,7 +3,6 @@ package com.example.PaseoAPP.controladores;
 import com.example.PaseoAPP.dtos.UsuarioDTO;
 import com.example.PaseoAPP.modelos.Usuario;
 import com.example.PaseoAPP.servicios.IUsuarioServicio;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +14,12 @@ import java.util.UUID;
 @RequestMapping("/paseoapi/v1/usuarios")
 public class UsuarioControlador {
 
-    @Autowired
-    IUsuarioServicio servicio;
+   
+    private final IUsuarioServicio servicio;
+
+    public UsuarioControlador(IUsuarioServicio servicio) {
+        this.servicio = servicio;
+    }
 
     @PostMapping
     public ResponseEntity<UsuarioDTO> controlarGuardado(@RequestBody Usuario datos){

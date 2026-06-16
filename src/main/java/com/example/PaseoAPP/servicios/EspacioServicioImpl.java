@@ -4,6 +4,7 @@ import com.example.PaseoAPP.dtos.EspacioDTO;
 import com.example.PaseoAPP.mapeadores.IMapaEspacio;
 import com.example.PaseoAPP.modelos.Espacio;
 import com.example.PaseoAPP.repositorios.IRepositorioEspacio;
+import com.example.PaseoAPP.validadores.IValidadorEspacio;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,33 +16,21 @@ import java.util.UUID;
 @Service
 public class EspacioServicioImpl implements IEspacioServicio {
 
-    // 1. Variables final
     private final IRepositorioEspacio repositorioEspacio;
     private final IMapaEspacio mapaEspacio;
+    private final IValidadorEspacio validador; // <--- El Validador
 
-    // 2. Inyección por constructor
-    public EspacioServicioImpl(IRepositorioEspacio repositorioEspacio, IMapaEspacio mapaEspacio) {
+    public EspacioServicioImpl(IRepositorioEspacio repositorioEspacio, IMapaEspacio mapaEspacio, IValidadorEspacio validador) {
         this.repositorioEspacio = repositorioEspacio;
         this.mapaEspacio = mapaEspacio;
+        this.validador = validador;
     }
 
     @Override
     public EspacioDTO guardarEspacioEnBD(Espacio datos) {
-        if(datos.getNombre() == null || datos.getNombre().isBlank()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre del espacio no puede enviarse vacio");
-        }
-        if(repositorioEspacio.findByNombre(datos.getNombre()).isPresent()){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe un espacio registrado con ese nombre");
-        }
-        if(datos.getDescripcion() == null || datos.getDescripcion().isBlank()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La descripcion del espacio no puede enviarse vacia");
-        }
-        if(datos.getAforo() == null || datos.getAforo() <= 0){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El aforo debe ser mayor a 0");
-        }
-
+        this.validador.validarEspacio(datos); // <--- Delega la validación
+        
         Espacio espacioGuardado = this.repositorioEspacio.save(datos);
-        // 3. Uso del mapeador inyectado
         return this.mapaEspacio.convertir_modelo_a_dto(espacioGuardado);
     }
 

@@ -3,7 +3,6 @@ package com.example.PaseoAPP.controladores;
 import com.example.PaseoAPP.dtos.ReservaDTO;
 import com.example.PaseoAPP.modelos.Reserva;
 import com.example.PaseoAPP.servicios.IReservaServicio;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +14,11 @@ import java.util.UUID;
 @RequestMapping("/paseoapi/v1/reservas")
 public class ReservaControlador {
 
-    @Autowired
-    IReservaServicio servicio;
+    private final IReservaServicio servicio;
+
+    public ReservaControlador(IReservaServicio servicio) {
+        this.servicio = servicio;
+    }
 
     @PostMapping
     public ResponseEntity<ReservaDTO> controlarGuardado(@RequestBody Reserva datos){

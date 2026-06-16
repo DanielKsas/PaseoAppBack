@@ -4,6 +4,7 @@ import com.example.PaseoAPP.dtos.ReservaDTO;
 import com.example.PaseoAPP.mapeadores.IMapaReserva;
 import com.example.PaseoAPP.modelos.Reserva;
 import com.example.PaseoAPP.repositorios.IRepositorioReserva;
+import com.example.PaseoAPP.validadores.IValidadorReserva;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,27 +16,21 @@ import java.util.UUID;
 @Service
 public class ReservaServicioImpl implements IReservaServicio {
 
-    // 1. Variables final
     private final IRepositorioReserva repositorioReserva;
     private final IMapaReserva mapaReserva;
+    private final IValidadorReserva validador; // <--- El Validador
 
-    // 2. Inyección por constructor
-    public ReservaServicioImpl(IRepositorioReserva repositorioReserva, IMapaReserva mapaReserva) {
+    public ReservaServicioImpl(IRepositorioReserva repositorioReserva, IMapaReserva mapaReserva, IValidadorReserva validador) {
         this.repositorioReserva = repositorioReserva;
         this.mapaReserva = mapaReserva;
+        this.validador = validador;
     }
 
     @Override
     public ReservaDTO guardarReservaEnBD(Reserva datos) {
-        if(datos.getFecha() == null || datos.getFecha().isBlank()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha de la reserva no puede enviarse vacia");
-        }
-        if(datos.getTiempo() == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El tiempo de la reserva no puede enviarse vacio");
-        }
-
+        this.validador.validarReserva(datos); // <--- Delega la validación
+        
         Reserva reservaGuardada = this.repositorioReserva.save(datos);
-        // 3. Uso del mapeador inyectado
         return this.mapaReserva.convertir_modelo_a_dto(reservaGuardada);
     }
 

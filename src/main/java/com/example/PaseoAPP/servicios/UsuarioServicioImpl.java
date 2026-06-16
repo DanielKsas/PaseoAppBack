@@ -4,6 +4,8 @@ import com.example.PaseoAPP.dtos.UsuarioDTO;
 import com.example.PaseoAPP.mapeadores.IMapaUsuario;
 import com.example.PaseoAPP.modelos.Usuario;
 import com.example.PaseoAPP.repositorios.IRepositorioUsuario;
+import com.example.PaseoAPP.validadores.IValidadorUsuario;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,30 +20,25 @@ public class UsuarioServicioImpl implements IUsuarioServicio {
     // 1. Declaramos las variables como private final
     private final IRepositorioUsuario repositorioUsuario;
     private final IMapaUsuario mapaUsuario;
+    private final IValidadorUsuario validador;
 
     // 2. Creamos el constructor para la inyección de dependencias
-    public UsuarioServicioImpl(IRepositorioUsuario repositorioUsuario, IMapaUsuario mapaUsuario) {
+    public UsuarioServicioImpl(IRepositorioUsuario repositorioUsuario, IMapaUsuario mapaUsuario, IValidadorUsuario validador) {
         this.repositorioUsuario = repositorioUsuario;
         this.mapaUsuario = mapaUsuario;
+        this.validador = validador;
     }
 
     @Override
     public UsuarioDTO guardarUsuarioEnBD(Usuario datos) {
-        if(datos.getCorreo() == null || datos.getCorreo().isBlank()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo no puede enviarse vacio");
-        }
-        if(repositorioUsuario.findByCorreo(datos.getCorreo()).isPresent()){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe un correo registrado igual al que me entregas");
-        }
-        if(datos.getNombres()==null || datos.getNombres().isBlank()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre digitado no puede enviarse vacio");
-        }
-        if(datos.getContraseña()==null || datos.getContraseña().length()<6){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La contraseña es obligatoria y debe tener al menos 6 caracteres");
-        }
+       // 1. El Inspector (Validador) hace TODO el trabajo de los if.
+        // Si algo está mal, él detiene el programa aquí mismo lanzando el error.
+        this.validador.validarUsuario(datos);
 
+        // 2. Si pasamos de la línea anterior, el Chef (Servicio) cocina tranquilo.
         Usuario usuarioGuardado = this.repositorioUsuario.save(datos);
-        // 3. Usamos la variable inyectada en lugar de IMapaUsuario.INSTANCIA
+        
+        // 3. Empacamos (Mapeador) y entregamos.
         return this.mapaUsuario.convertir_modelo_a_dto(usuarioGuardado);
     }
 
