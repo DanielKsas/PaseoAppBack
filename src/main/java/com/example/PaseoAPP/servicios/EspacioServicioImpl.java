@@ -4,7 +4,6 @@ import com.example.PaseoAPP.dtos.EspacioDTO;
 import com.example.PaseoAPP.mapeadores.IMapaEspacio;
 import com.example.PaseoAPP.modelos.Espacio;
 import com.example.PaseoAPP.repositorios.IRepositorioEspacio;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,8 +15,15 @@ import java.util.UUID;
 @Service
 public class EspacioServicioImpl implements IEspacioServicio {
 
-    @Autowired
-    private IRepositorioEspacio repositorioEspacio;
+    // 1. Variables final
+    private final IRepositorioEspacio repositorioEspacio;
+    private final IMapaEspacio mapaEspacio;
+
+    // 2. Inyección por constructor
+    public EspacioServicioImpl(IRepositorioEspacio repositorioEspacio, IMapaEspacio mapaEspacio) {
+        this.repositorioEspacio = repositorioEspacio;
+        this.mapaEspacio = mapaEspacio;
+    }
 
     @Override
     public EspacioDTO guardarEspacioEnBD(Espacio datos) {
@@ -35,7 +41,8 @@ public class EspacioServicioImpl implements IEspacioServicio {
         }
 
         Espacio espacioGuardado = this.repositorioEspacio.save(datos);
-        return IMapaEspacio.INSTANCIA.convertir_modelo_a_dto(espacioGuardado);
+        // 3. Uso del mapeador inyectado
+        return this.mapaEspacio.convertir_modelo_a_dto(espacioGuardado);
     }
 
     @Override
@@ -62,7 +69,7 @@ public class EspacioServicioImpl implements IEspacioServicio {
         espacio_que_encontre.setAforo(datos.getAforo());
         
         Espacio espacioModificado = this.repositorioEspacio.save(espacio_que_encontre);
-        return IMapaEspacio.INSTANCIA.convertir_modelo_a_dto(espacioModificado);
+        return this.mapaEspacio.convertir_modelo_a_dto(espacioModificado);
     }
 
     @Override
@@ -77,6 +84,6 @@ public class EspacioServicioImpl implements IEspacioServicio {
     @Override
     public List<EspacioDTO> buscarEspaciosEnBD() {
         List<Espacio> espaciosEnBD = this.repositorioEspacio.findAll();
-        return IMapaEspacio.INSTANCIA.convertir_lista_de_modelo_a_lista_de_dto(espaciosEnBD);
+        return this.mapaEspacio.convertir_lista_de_modelo_a_lista_de_dto(espaciosEnBD);
     }
 }

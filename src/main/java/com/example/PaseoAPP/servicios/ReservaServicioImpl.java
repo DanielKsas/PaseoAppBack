@@ -4,7 +4,6 @@ import com.example.PaseoAPP.dtos.ReservaDTO;
 import com.example.PaseoAPP.mapeadores.IMapaReserva;
 import com.example.PaseoAPP.modelos.Reserva;
 import com.example.PaseoAPP.repositorios.IRepositorioReserva;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,8 +15,15 @@ import java.util.UUID;
 @Service
 public class ReservaServicioImpl implements IReservaServicio {
 
-    @Autowired
-    private IRepositorioReserva repositorioReserva;
+    // 1. Variables final
+    private final IRepositorioReserva repositorioReserva;
+    private final IMapaReserva mapaReserva;
+
+    // 2. Inyección por constructor
+    public ReservaServicioImpl(IRepositorioReserva repositorioReserva, IMapaReserva mapaReserva) {
+        this.repositorioReserva = repositorioReserva;
+        this.mapaReserva = mapaReserva;
+    }
 
     @Override
     public ReservaDTO guardarReservaEnBD(Reserva datos) {
@@ -29,7 +35,8 @@ public class ReservaServicioImpl implements IReservaServicio {
         }
 
         Reserva reservaGuardada = this.repositorioReserva.save(datos);
-        return IMapaReserva.INSTANCIA.convertir_modelo_a_dto(reservaGuardada);
+        // 3. Uso del mapeador inyectado
+        return this.mapaReserva.convertir_modelo_a_dto(reservaGuardada);
     }
 
     @Override
@@ -51,7 +58,7 @@ public class ReservaServicioImpl implements IReservaServicio {
         reserva_que_encontre.setTiempo(datos.getTiempo());
         
         Reserva reservaModificada = this.repositorioReserva.save(reserva_que_encontre);
-        return IMapaReserva.INSTANCIA.convertir_modelo_a_dto(reservaModificada);
+        return this.mapaReserva.convertir_modelo_a_dto(reservaModificada);
     }
 
     @Override
@@ -66,6 +73,6 @@ public class ReservaServicioImpl implements IReservaServicio {
     @Override
     public List<ReservaDTO> buscarReservasEnBD() {
         List<Reserva> reservasEnBD = this.repositorioReserva.findAll();
-        return IMapaReserva.INSTANCIA.convertir_lista_de_modelo_a_lista_de_dto(reservasEnBD);
+        return this.mapaReserva.convertir_lista_de_modelo_a_lista_de_dto(reservasEnBD);
     }
 }

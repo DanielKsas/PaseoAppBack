@@ -4,7 +4,6 @@ import com.example.PaseoAPP.dtos.UsuarioDTO;
 import com.example.PaseoAPP.mapeadores.IMapaUsuario;
 import com.example.PaseoAPP.modelos.Usuario;
 import com.example.PaseoAPP.repositorios.IRepositorioUsuario;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,8 +15,15 @@ import java.util.UUID;
 @Service
 public class UsuarioServicioImpl implements IUsuarioServicio {
 
-    @Autowired
-    private IRepositorioUsuario repositorioUsuario;
+    // 1. Declaramos las variables como private final
+    private final IRepositorioUsuario repositorioUsuario;
+    private final IMapaUsuario mapaUsuario;
+
+    // 2. Creamos el constructor para la inyección de dependencias
+    public UsuarioServicioImpl(IRepositorioUsuario repositorioUsuario, IMapaUsuario mapaUsuario) {
+        this.repositorioUsuario = repositorioUsuario;
+        this.mapaUsuario = mapaUsuario;
+    }
 
     @Override
     public UsuarioDTO guardarUsuarioEnBD(Usuario datos) {
@@ -35,7 +41,8 @@ public class UsuarioServicioImpl implements IUsuarioServicio {
         }
 
         Usuario usuarioGuardado = this.repositorioUsuario.save(datos);
-        return IMapaUsuario.INSTANCIA.convertir_modelo_a_dto(usuarioGuardado);
+        // 3. Usamos la variable inyectada en lugar de IMapaUsuario.INSTANCIA
+        return this.mapaUsuario.convertir_modelo_a_dto(usuarioGuardado);
     }
 
     @Override
@@ -52,7 +59,8 @@ public class UsuarioServicioImpl implements IUsuarioServicio {
 
         usuario_que_encontre.setNombres(datos.getNombres());
         Usuario usuarioModificado = this.repositorioUsuario.save(usuario_que_encontre);
-        return IMapaUsuario.INSTANCIA.convertir_modelo_a_dto(usuarioModificado);
+        
+        return this.mapaUsuario.convertir_modelo_a_dto(usuarioModificado);
     }
 
     @Override
@@ -67,6 +75,6 @@ public class UsuarioServicioImpl implements IUsuarioServicio {
     @Override
     public List<UsuarioDTO> buscarUsuariosEnBD() {
         List<Usuario> usuariosEnBD = this.repositorioUsuario.findAll();
-        return IMapaUsuario.INSTANCIA.convertir_lista_de_modelo_a_lista_de_dto(usuariosEnBD);
+        return this.mapaUsuario.convertir_lista_de_modelo_a_lista_de_dto(usuariosEnBD);
     }
 }
