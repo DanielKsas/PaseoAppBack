@@ -1,6 +1,12 @@
 package com.example.PaseoAPP.dtos;
 
-public record ReservaDTO() {
+import com.example.PaseoAPP.enums.FranjaHoraria;
+import java.util.UUID;
 
-    //id fecha tiempo
-}
+public record ReservaDTO( 
+       UUID id,
+       String fecha,
+       FranjaHoraria tiempo,
+       String correoUsuario,
+       String nombreEspacio
+) {}

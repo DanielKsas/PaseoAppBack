@@ -14,10 +14,10 @@ public class Espacio {
     private String nombre;
     private String descripcion;
     private String foto;
-    private int aforo;
+    private Integer aforo;
     public Espacio() {
     }
-    public Espacio(UUID id, String nombre, String descripcion, String foto, int aforo) {
+    public Espacio(UUID id, String nombre, String descripcion, String foto, Integer aforo) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -48,10 +48,10 @@ public class Espacio {
     public void setFoto(String foto) {
         this.foto = foto;
     }
-    public int getAforo() {
+    public Integer getAforo() {
         return aforo;
     }
-    public void setAforo(int aforo) {
+    public void setAforo(Integer aforo) {
         this.aforo = aforo;
     }
 

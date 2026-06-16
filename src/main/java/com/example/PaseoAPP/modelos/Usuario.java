@@ -15,6 +15,7 @@ public class Usuario {
     private String nombres;
     private String correo;
     private String contraseña;
+    @Enumerated(EnumType.STRING)
     private Rol rol;
     public Usuario() {
     }

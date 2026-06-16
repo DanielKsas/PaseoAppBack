@@ -1,7 +1,12 @@
 package com.example.PaseoAPP.dtos;
 
-public record EspacioDTO() {
+import java.util.UUID;
 
-    //nombre descripcion foto aforo
-
-}
+public record EspacioDTO(
+     UUID id,
+     String nombre, 
+     String descripcion, 
+     String foto, 
+     int aforo
+ ) 
+    {}
