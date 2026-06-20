@@ -44,16 +44,18 @@ public class UsuarioServicioImpl implements IUsuarioServicio {
 
     @Override
     public UsuarioDTO modificarUsuarioEnBD(Usuario datos, UUID id) {
+        // 1. Buscamos si existe el usuario
         Optional<Usuario> usuario_que_estoy_buscando = this.repositorioUsuario.findById(id);
         if(usuario_que_estoy_buscando.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El usuario que quieres editar, no existe en BD");
         }
         
         Usuario usuario_que_encontre = usuario_que_estoy_buscando.get();
-        if(datos.getNombres() == null || datos.getNombres().isBlank()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Revisa el nombre ingresado");
-        }
+        
+        // 2. Delegamos la validación de los datos nuevos al Inspector (¡Adiós al if!)
+        this.validador.validarModificacionUsuario(datos);
 
+        // 3. Actualizamos y guardamos
         usuario_que_encontre.setNombres(datos.getNombres());
         Usuario usuarioModificado = this.repositorioUsuario.save(usuario_que_encontre);
         

@@ -15,7 +15,8 @@ public class ValidadorUsuarioImpl implements IValidadorUsuario {
         this.repositorioUsuario = repositorioUsuario;
     }
 
-    @Override // <--- Faltaba esto para confirmar que viene de la interfaz
+    // --- PRIMER MÉTODO (Validar la creación) ---
+    @Override 
     public void validarUsuario(Usuario datos) {
         if(datos.getCorreo() == null || datos.getCorreo().isBlank()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo no puede enviarse vacio");
@@ -29,5 +30,14 @@ public class ValidadorUsuarioImpl implements IValidadorUsuario {
         if(datos.getContraseña()==null || datos.getContraseña().length()<6){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contraseña inválida");
         }
-    }
-}
+    } // <--- ¡Aquí se cierra el primer método!
+
+    // --- SEGUNDO MÉTODO (Validar la modificación) ---
+    @Override
+    public void validarModificacionUsuario(Usuario datos) {
+        if(datos.getNombres() == null || datos.getNombres().isBlank()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Revisa el nombre ingresado");
+        }
+    } // <--- ¡Aquí se cierra el segundo método!
+
+} 
